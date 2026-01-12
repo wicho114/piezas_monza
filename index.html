@@ -119,16 +119,22 @@
           const div = document.createElement("div");
           div.className = "card";
           div.innerHTML = `
-            ${
-              p.foto_url
-              ? `<img src="${p.foto_url}" alt="pieza">`
-              : `<div class="no-img">Sin imagen</div>`
-            }
-            <strong>${p.nombre}</strong>
-            <span>${p.categoria}</span>
-            <span>$${p.precio}</span>
-            <button class="btn-delete" onclick="eliminar(${p.id})">🗑️ Borrar</button>
-          `;
+  ${
+    p.foto_url
+    ? `<img 
+         src="${p.foto_url}" 
+         alt="pieza"
+         onclick="verImagen('${p.foto_url}')"
+         style="cursor: zoom-in;"
+       >`
+    : `<div class="no-img">Sin imagen</div>`
+  }
+  <strong>${p.nombre}</strong>
+  <span>${p.categoria}</span>
+  <span>$${p.precio}</span>
+  <button class="btn-delete" onclick="eliminar(${p.id})">🗑️ Borrar</button>
+`;
+
           lista.appendChild(div);
         });
 
