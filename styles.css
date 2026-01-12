@@ -230,3 +230,26 @@ body.dark .modal-content {
     display: none !important;
   }
 }
+/* ===== MOBILE TITLE ===== */
+.mobile-title {
+  display: none;
+  text-align: center;
+  padding: 14px 0;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+.mobile-title .blue {
+  color: #2563eb;
+}
+
+.mobile-title .red {
+  color: #dc2626;
+}
+
+/* Mostrar solo en móvil */
+@media (max-width: 768px) {
+  .mobile-title {
+    display: block;
+  }
+}
