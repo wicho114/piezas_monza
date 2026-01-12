@@ -57,6 +57,9 @@
       </div>
     </div>
   </div>
+<div id="imgModal" class="img-modal" onclick="cerrarImagen()">
+  <img id="imgModalContent">
+</div>
 
   <!-- JS -->
   <script>
@@ -180,6 +183,17 @@
         cargar();
       }
     }
+  function verImagen(src) {
+  const modal = document.getElementById("imgModal");
+  const img = document.getElementById("imgModalContent");
+  img.src = src;
+  modal.style.display = "flex";
+}
+
+function cerrarImagen() {
+  document.getElementById("imgModal").style.display = "none";
+}
+
   </script>
 
 </body>
