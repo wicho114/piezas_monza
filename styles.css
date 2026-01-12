@@ -266,3 +266,26 @@ button {
   }
 }
 
+/* ===== MOBILE ONLY ===== */
+@media (max-width: 768px) {
+
+  header {
+    display: none !important;
+  }
+
+  .mobile-bar {
+    display: flex !important;
+  }
+
+}
+
+/* ===== DESKTOP ===== */
+@media (min-width: 769px) {
+
+  .mobile-bar {
+    display: none !important;
+  }
+
+}
+
+
