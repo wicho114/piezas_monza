@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function abrirModal() {
   modal.style.display = 'flex';
 }
+
 function cerrarModal() {
   modal.style.display = 'none';
 }
@@ -167,14 +168,16 @@ async function guardar() {
 
   try {
     const res = await fetch(`${API}/vender`, { method: 'POST', body: fd });
-    if (!res.ok) throw new Error();
+    if (!res.ok) throw new Error('Error al guardar');
 
     Swal.fire('Guardado', 'La pieza fue registrada', 'success');
     cerrarModal();
-    nombre.value = categoria.value = precio.value = '';
+    nombre.value = '';
+    categoria.value = '';
+    precio.value = '';
     foto.value = '';
     cargar();
-  } catch {
+  } catch (e) {
     Swal.fire('Error', 'No se pudo guardar', 'error');
   }
 }
