@@ -66,10 +66,15 @@
     <input id="search" placeholder="Buscar pieza..." />
     <button onclick="buscar()">🔍</button>
   </div>
-  <button class="btn-add" onclick="abrirModal()">➕ Agregar</button>
 </header>
 
-<main id="lista"></main>
+<main>
+  <div style="margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <div id="mensaje" style="color:#555;font-weight:bold"></div>
+    <button class="btn-add" onclick="abrirModal()">➕ Agregar nueva pieza</button>
+  </div>
+  <div id="lista"></div>
+</main>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
@@ -96,13 +101,17 @@ function cerrarModal(){
 
 async function cargar(buscar = ''){
   lista.innerHTML = '';
+  mensaje.innerText = 'Cargando resultados...';
+
   const res = await fetch(`${API}/ventas?buscar=${encodeURIComponent(buscar)}`);
   const data = await res.json();
 
-  if (!Array.isArray(data) || data.length === 0) {
-    lista.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#666">No se encontraron piezas</p>';
+  if(!Array.isArray(data) || data.length === 0){
+    mensaje.innerText = 'No se encontraron piezas';
     return;
   }
+
+  mensaje.innerText = `Mostrando ${data.length} resultado(s)`;
 
   data.forEach(p => {
     const div = document.createElement('div');
