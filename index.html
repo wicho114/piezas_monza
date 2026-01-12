@@ -87,8 +87,12 @@
 <script>
 const API = 'http://127.0.0.1:8000';
 
-function abrirModal(){ modal.style.display = 'flex'; }
-function cerrarModal(){ modal.style.display = 'none'; }
+function abrirModal(){
+  document.getElementById('modal').style.display = 'flex';
+}
+function cerrarModal(){
+  document.getElementById('modal').style.display = 'none';
+}
 
 async function cargar(buscar = ''){
   lista.innerHTML = '';
@@ -129,20 +133,29 @@ async function cargar(buscar = ''){
 }
 
 async function guardar(){
+  if(!nombre.value){
+    Swal.fire('Falta nombre','Debes ingresar el nombre de la pieza','warning');
+    return;
+  }
+
   const fd = new FormData();
   fd.append('nombre', nombre.value);
-  fd.append('categoria', categoria.value);
-  fd.append('precio', precio.value);
+  fd.append('categoria', categoria.value || 'Otro');
+  fd.append('precio', precio.value || 0);
   if(foto.files[0]) fd.append('foto', foto.files[0]);
 
-  const res = await fetch(`${API}/vender`, { method:'POST', body: fd });
+  try{
+    const res = await fetch(`${API}/vender`, { method:'POST', body: fd });
 
-  if(res.ok){
-    Swal.fire('Guardado', 'La pieza fue registrada correctamente', 'success');
+    if(!res.ok) throw new Error();
+
+    Swal.fire('Guardado','La pieza fue registrada correctamente','success');
     cerrarModal();
+    nombre.value = categoria.value = precio.value = '';
+    foto.value = '';
     cargar();
-  } else {
-    Swal.fire('Error', 'No se pudo guardar', 'error');
+  }catch{
+    Swal.fire('Error','No se pudo guardar la pieza','error');
   }
 }
 
