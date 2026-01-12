@@ -61,6 +61,14 @@
   <img id="imgModalContent">
 </div>
 
+  <!-- mobil -->
+
+  <div class="mobile-bar">
+  <input id="buscarMobile" placeholder="Buscar pieza...">
+  <button onclick="buscarMobile()">Buscar</button>
+  <button onclick="abrirModal()">＋</button>
+</div>
+
   <!-- JS -->
   <script>
     const API = "http://127.0.0.1:8000";
@@ -183,6 +191,7 @@
         cargar();
       }
     }
+    
   function verImagen(src) {
   const modal = document.getElementById("imgModal");
   const img = document.getElementById("imgModalContent");
@@ -192,6 +201,13 @@
 
 function cerrarImagen() {
   document.getElementById("imgModal").style.display = "none";
+}
+
+function buscarMobile() {
+  document.getElementById("buscar").value =
+    document.getElementById("buscarMobile").value;
+
+  buscarPiezas();
 }
 
   </script>
