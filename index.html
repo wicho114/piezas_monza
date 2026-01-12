@@ -24,17 +24,22 @@
     <div class="actions">
       <input id="search" placeholder="Buscar pieza..." />
       <button onclick="buscar()">🔍</button>
-      <button onclick="abrirModal()">➕ Agregar</button>
+      <button class="btn-add" onclick="abrirModal()">➕ Agregar</button>
       <button onclick="toggleTheme()">🌙</button>
     </div>
   </header>
 
-  <!-- PANEL LATERAL -->
-  <aside class="sidebar">
-    <h3>Últimas ventas</h3>
-    <p id="mensaje"></p>
-    <div id="lista" class="grid"></div>
-  </aside>
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="container">
+
+    <!-- RESULTADOS -->
+    <section class="sidebar">
+      <h3>Últimas piezas registradas</h3>
+      <p id="mensaje"></p>
+      <div id="lista" class="grid"></div>
+    </section>
+
+  </main>
 
   <!-- MODAL -->
   <div id="modal" class="modal">
@@ -47,7 +52,7 @@
       <input id="foto" type="file" accept="image/*" />
 
       <div class="modal-actions">
-        <button onclick="guardar()">Guardar</button>
+        <button class="btn-add" onclick="guardar()">Guardar</button>
         <button onclick="cerrarModal()">Cancelar</button>
       </div>
     </div>
@@ -85,25 +90,27 @@
 
     async function cargar(buscar = "") {
       lista.innerHTML = "";
-      mensaje.innerText = "Cargando...";
+      mensaje.innerText = "Cargando piezas...";
 
       try {
         const res = await fetch(`${API}/ventas?buscar=${buscar}`);
         const data = await res.json();
 
         if (!data.length) {
-          mensaje.innerText = "Sin resultados";
+          mensaje.innerText = "No se encontraron resultados";
           return;
         }
 
-        mensaje.innerText = `Mostrando ${Math.min(3, data.length)} piezas`;
+        const mostrar = data.slice(0, 3);
+        mensaje.innerText = `Mostrando ${mostrar.length} pieza(s) recientes`;
 
-        data.slice(0, 3).forEach(p => {
+        mostrar.forEach(p => {
           const div = document.createElement("div");
           div.className = "card";
           div.innerHTML = `
-            ${p.foto_url
-              ? `<img src="${p.foto_url}">`
+            ${
+              p.foto_url
+              ? `<img src="${p.foto_url}" alt="pieza">`
               : `<div class="no-img">Sin imagen</div>`
             }
             <strong>${p.nombre}</strong>
@@ -115,7 +122,7 @@
         });
 
       } catch (e) {
-        mensaje.innerText = "Error al conectar con la API";
+        mensaje.innerText = "❌ Error al conectar con la API";
       }
     }
 
@@ -143,7 +150,7 @@
 
         if (!res.ok) throw new Error();
 
-        Swal.fire("Guardado", "Pieza registrada correctamente", "success");
+        Swal.fire("✅ Guardado", "Pieza registrada correctamente", "success");
 
         cerrarModal();
         nombre.value = "";
@@ -154,13 +161,14 @@
         cargar();
 
       } catch {
-        Swal.fire("Error", "No se pudo guardar", "error");
+        Swal.fire("❌ Error", "No se pudo guardar la pieza", "error");
       }
     }
 
     async function eliminar(id) {
       const r = await Swal.fire({
         title: "¿Eliminar pieza?",
+        text: "También se borrará la imagen",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Sí, eliminar"
@@ -168,7 +176,7 @@
 
       if (r.isConfirmed) {
         await fetch(`${API}/ventas/${id}`, { method: "DELETE" });
-        Swal.fire("Eliminado", "Pieza eliminada", "success");
+        Swal.fire("🗑️ Eliminado", "Pieza eliminada", "success");
         cargar();
       }
     }
