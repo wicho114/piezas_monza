@@ -90,60 +90,72 @@
 </div>
 
 <script>
+// ========= CONFIG =========
 const API = 'http://127.0.0.1:8000';
 
-function abrirModal(){
-  document.getElementById('modal').style.display = 'flex';
+// ========= DOM READY =========
+document.addEventListener('DOMContentLoaded', () => {
+  window.lista = document.getElementById('lista');
+  window.mensaje = document.getElementById('mensaje');
+  window.modal = document.getElementById('modal');
+  window.nombre = document.getElementById('nombre');
+  window.categoria = document.getElementById('categoria');
+  window.precio = document.getElementById('precio');
+  window.foto = document.getElementById('foto');
+  window.search = document.getElementById('search');
+
+  cargar();
+});
+
+// ========= MODAL =========
+function abrirModal() {
+  modal.style.display = 'flex';
 }
-function cerrarModal(){
-  document.getElementById('modal').style.display = 'none';
+function cerrarModal() {
+  modal.style.display = 'none';
 }
 
-async function cargar(buscar = ''){
+// ========= DATA =========
+async function cargar(buscar = '') {
   lista.innerHTML = '';
   mensaje.innerText = 'Cargando resultados...';
 
-  const res = await fetch(`${API}/ventas?buscar=${encodeURIComponent(buscar)}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`${API}/ventas?buscar=${encodeURIComponent(buscar)}`);
+    const data = await res.json();
 
-  if(!Array.isArray(data) || data.length === 0){
-    mensaje.innerText = 'No se encontraron piezas';
-    return;
+    if (!Array.isArray(data) || data.length === 0) {
+      mensaje.innerText = 'No se encontraron piezas';
+      return;
+    }
+
+    mensaje.innerText = `Mostrando ${data.length} resultado(s)`;
+
+    data.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        ${p.foto_url ? `<img src="${p.foto_url}">` : '<div style="height:160px;background:#e5e7eb;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#6b7280">Sin imagen</div>'}
+        <strong>${p.nombre}</strong>
+        <span>${p.categoria}</span>
+        <span>$${p.precio}</span>
+        <button class="btn-delete" onclick="eliminar(${p.id})">🗑️ Borrar</button>
+      `;
+      lista.appendChild(div);
+    });
+  } catch (e) {
+    mensaje.innerText = 'Error al conectar con la API';
   }
-
-  mensaje.innerText = `Mostrando ${data.length} resultado(s)`;
-
-  data.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      ${p.foto_url ? `<img src="${p.foto_url}">` : '<div style="height:160px;background:#e5e7eb;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#6b7280">Sin imagen</div>'}
-      <strong>${p.nombre}</strong>
-      <span>${p.categoria}</span>
-      <span>$${p.precio}</span>
-      <button class="btn-delete" onclick="eliminar(${p.id})">🗑️ Borrar</button>
-    `;
-    lista.appendChild(div);
-  });
 }
 
-  data.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      ${p.foto_url ? `<img src="${p.foto_url}">` : ''}
-      <strong>${p.nombre}</strong>
-      <span>${p.categoria}</span>
-      <span>$${p.precio}</span>
-      <button class="btn-delete" onclick="eliminar(${p.id})">🗑️ Borrar</button>
-    `;
-    lista.appendChild(div);
-  });
+function buscar() {
+  cargar(search.value);
 }
 
-async function guardar(){
-  if(!nombre.value){
-    Swal.fire('Falta nombre','Debes ingresar el nombre de la pieza','warning');
+// ========= ACTIONS =========
+async function guardar() {
+  if (!nombre.value) {
+    Swal.fire('Falta nombre', 'Ingresa el nombre de la pieza', 'warning');
     return;
   }
 
@@ -151,45 +163,36 @@ async function guardar(){
   fd.append('nombre', nombre.value);
   fd.append('categoria', categoria.value || 'Otro');
   fd.append('precio', precio.value || 0);
-  if(foto.files[0]) fd.append('foto', foto.files[0]);
+  if (foto.files[0]) fd.append('foto', foto.files[0]);
 
-  try{
-    const res = await fetch(`${API}/vender`, { method:'POST', body: fd });
+  try {
+    const res = await fetch(`${API}/vender`, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error();
 
-    if(!res.ok) throw new Error();
-
-    Swal.fire('Guardado','La pieza fue registrada correctamente','success');
+    Swal.fire('Guardado', 'La pieza fue registrada', 'success');
     cerrarModal();
     nombre.value = categoria.value = precio.value = '';
     foto.value = '';
     cargar();
-  }catch{
-    Swal.fire('Error','No se pudo guardar la pieza','error');
+  } catch {
+    Swal.fire('Error', 'No se pudo guardar', 'error');
   }
 }
 
-async function eliminar(id){
+async function eliminar(id) {
   const r = await Swal.fire({
     title: '¿Eliminar pieza?',
-    icon: 'warning', showCancelButton: true,
+    icon: 'warning',
+    showCancelButton: true,
     confirmButtonText: 'Sí, eliminar'
   });
 
-  if(r.isConfirmed){
-    const res = await fetch(`${API}/ventas/${id}`, { method:'DELETE' });
-    if(res.ok){
-      Swal.fire('Eliminado', 'La pieza fue eliminada', 'success');
-      cargar();
-    }
+  if (r.isConfirmed) {
+    await fetch(`${API}/ventas/${id}`, { method: 'DELETE' });
+    Swal.fire('Eliminado', 'La pieza fue eliminada', 'success');
+    cargar();
   }
 }
-
-function buscar(){
-  const q = search.value;
-  cargar(q);
-}
-
-cargar();
 </script>
 
 </body>
